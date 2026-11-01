@@ -18,6 +18,9 @@ par le service Nexellin, mis à disposition au titre de l'article 13 de l'AGPL-3
    signature intégré au CRM, ni sur le certificat et le journal d'audit. Le fichier `LICENSE` et
    ce code restent publiés.
 
+Le build échoue si `hidePoweredBy` apparaît ailleurs qu'aux sites connus. Restent en place : le
+pied de page des e-mails et la branche sans enveloppe de l'écran multisign. Le retrait de la marque est permis, pas obligatoire.
+
 Le build s'arrête si le code amont ne correspond plus.
 
 ## Reconstruire l'image

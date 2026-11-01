@@ -42,3 +42,13 @@ force_marque "$BUNDLE" 7
 force_marque "$(ls "$BUILD"/assets/seal-document.handler-*.js)" 2
 force_marque "$PDF/generate-certificate-pdf.js" 1
 force_marque "$PDF/generate-audit-log-pdf.js" 1
+
+# Toute autre occurrence du drapeau arrête le build, formes `?.` et fichiers inconnus compris.
+# Laissées en place : pied de page des e-mails et branding du destinataire.
+ATTENDU='2 assets/get-email-context.js
+1 assets/server-build.js
+2 hono/packages/lib/server-only/email/get-email-context.js'
+RESTES="$(cd "$BUILD" && find . -type f -name '*.js' -exec grep -HEo 'flags\??\.hidePoweredBy' {} + \
+  | sed -E 's#^\./##; s#^(assets/(server-build|get-email-context))-[^/:]*\.js:#\1.js:#; s/:.*$//' | LC_ALL=C sort | uniq -c | awk '{print $1, $2}')"
+[ "$RESTES" = "$ATTENDU" ] || fail "occurrences de hidePoweredBy non traitées :
+$RESTES"
