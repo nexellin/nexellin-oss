@@ -3,12 +3,16 @@
 # un écart à une montée de version arrête le build au lieu de perdre le correctif.
 #  - cookie `lang` : 6 mois au lieu de 2 ans (politique cookies 08, rétention 11 § 2.7) ;
 #  - IP du signataire : CF-Connecting-IP d'abord. Le premier élément de X-Forwarded-For
-#    vient du client et se falsifie ; or l'IP figure dans la preuve de signature.
+#    vient du client et se falsifie ; or l'IP figure dans la preuve de signature ;
+#  - marque Documenso : ni QR code, ni logo, ni « Propulsé par » sur le certificat, le journal
+#    d'audit et l'écran de signature, quel que soit le plan de l'organisation.
 set -eu
 
 BUILD="${DOCUMENSO_BUILD_DIR:-/app/apps/remix/build/server}"
 BUNDLE="$(ls "$BUILD"/assets/server-build-*.js)"
 HONO="$BUILD/hono/packages/lib/universal/get-ip-address.js"
+
+PDF="$BUILD/hono/packages/lib/server-only/pdf"
 
 fail() { echo "patch documenso : $1" >&2; exit 1; }
 
@@ -26,3 +30,15 @@ CF='  const cf = req.headers.get("cf-connecting-ip");\n  if (cf) return cf;'
 sed -i "/^const getIpAddress = (req) => {\$/a\\$CF" "$BUNDLE"
 sed -i "/^const getIpAddress = req => {\$/a\\$CF" "$HONO"
 [ "$(grep -c 'cf-connecting-ip");$' "$HONO")" -ge 1 ] || fail "IP non modifiée (hono)"
+
+# force_marque <fichier> <nombre de sites attendu>
+force_marque() {
+  [ "$(grep -c 'organisationClaim\.flags\.hidePoweredBy' "$1")" -eq "$2" ] || fail "sites de hidePoweredBy changés : $1"
+  sed -i 's/organisationClaim\.flags\.hidePoweredBy/true/g' "$1"
+  if grep -q 'flags\.hidePoweredBy' "$1"; then fail "hidePoweredBy non forcé : $1"; fi
+}
+# Écrans : chargeurs des routes d'embed et d'impression. PDF : scellement (2) et téléchargement (2).
+force_marque "$BUNDLE" 7
+force_marque "$(ls "$BUILD"/assets/seal-document.handler-*.js)" 2
+force_marque "$PDF/generate-certificate-pdf.js" 1
+force_marque "$PDF/generate-audit-log-pdf.js" 1
