@@ -14,8 +14,9 @@ par le service Nexellin, mis à disposition au titre de l'article 13 de l'AGPL-3
 
 1. le cookie `lang` dure 6 mois au lieu de 2 ans ;
 2. l'adresse IP du signataire est lue d'abord dans `CF-Connecting-IP`, avant `X-Forwarded-For` ;
-3. `hidePoweredBy` est forcé à vrai : ni QR code, ni logo, ni « Propulsé par » sur le certificat,
-   le journal d'audit et l'écran de signature. Le fichier `LICENSE` et ce code restent publiés.
+3. `hidePoweredBy` est forcé à vrai : ni QR code, ni logo, ni « Propulsé par » dans l'écran de
+   signature intégré au CRM, ni sur le certificat et le journal d'audit. Le fichier `LICENSE` et
+   ce code restent publiés.
 
 Le build s'arrête si le code amont ne correspond plus.
 
